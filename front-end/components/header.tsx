@@ -5,13 +5,13 @@ export default function Header() {
   return (
     <header className="border-b">
       <div className="container flex items-center justify-between h-16 px-4">
-        <div className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
           <Image src="/logo.png" alt="Kwangwoon University Logo" width={50} height={50} className="object-contain" />
           <div>
             <h1 className="text-xl font-bold text-rose-600">KWANGWOON UNIVERSITY</h1>
             <p className="text-xs text-gray-500">광운대학교</p>
           </div>
-        </div>
+        </Link>
         <nav className="hidden md:flex">
           <ul className="flex items-center space-x-8">
             <li className="font-medium hover:text-rose-600 cursor-pointer">

@@ -10,9 +10,8 @@ async function login(req, res) {
     .findOne({ where: { id_num: id_num } })
     .catch((err) => console.log(err));
 
-  if (Object.keys(user).length === 0 && user.constructor === Object) {
+  if (!user)
     return res.status(401).json({ message: "Invalid user or password" });
-  }
 
   const isValidPassword = await bcrypt.compare(password, user.password_hashed);
   if (!isValidPassword) {
@@ -33,9 +32,8 @@ async function me(req, res, next) {
   const user = await model.user
     .findOne({ where: { user_id: req.user_id } })
     .catch((err) => console.log(err));
-  if (Object.keys(user).length === 0 && user.constructor === Object) {
-    return res.status(404).json({ message: "User not found" });
-  }
+  if (!user) return res.status(404).json({ message: "User not found" });
+
   res.status(200).json({ token: req.token, id_num: user.id_num });
 }
 

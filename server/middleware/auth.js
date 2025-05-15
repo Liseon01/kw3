@@ -19,9 +19,7 @@ const isAuth = async (req, res, next) => {
       .findOne({ where: { user_id: decoded.id } }) // findOne은 객체로 반환
       .catch((err) => console.log(err));
 
-    if (Object.keys(user).length === 0 && user.constructor === Object) {
-      return res.status(401).json(AUTH_ERROR);
-    }
+    if (!user) return res.status(401).json(AUTH_ERROR);
 
     req.user_id = user.user_id; // req.customData
     next();

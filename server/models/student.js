@@ -81,11 +81,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
+        defaultValue: sequelize.fn("now"),
       },
       updatedAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
+        defaultValue: sequelize.fn("now"),
       },
       department_id: {
         allowNull: false,

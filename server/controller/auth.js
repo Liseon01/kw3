@@ -1,12 +1,11 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const model = require("../models");
-// const * as userRepository require() "../data/auth.js";
 const config = require("../configs/config");
 
 async function login(req, res) {
   const { id_num, password } = req.body;
-  const user = await model.user // 리턴값 = Array
+  const user = await model.user // 리턴값 Object
     .findOne({ where: { id_num: id_num } })
     .catch((err) => console.log(err));
 

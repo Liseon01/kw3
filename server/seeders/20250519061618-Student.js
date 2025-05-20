@@ -22,7 +22,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         department_id: 1,
-        user_id: 6,
+        user_id: 1,
       },
       {
         name: "이석영",
@@ -42,7 +42,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         department_id: 1,
-        user_id: 7,
+        user_id: 2,
       },
       {
         name: "장지웅",
@@ -62,7 +62,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         department_id: 1,
-        user_id: 8,
+        user_id: 3,
       },
       {
         name: "홍길동",
@@ -82,7 +82,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         department_id: 1,
-        user_id: 9,
+        user_id: 4,
       },
     ]);
   },

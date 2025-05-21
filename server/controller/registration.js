@@ -1,7 +1,7 @@
 const model = require("../models");
 // GET (TEST)
 async function getAllRegistrationInfo(req, res) {}
-// GET
+// GET 수강신청 내역 확인
 async function getAllRegistrationInfoById(req, res) {
   const user_id = req.user_id;
   if (!user_id) {
@@ -22,7 +22,7 @@ async function getAllRegistrationInfoById(req, res) {
     .findAll({ where: { student_id: student_info.student_id } })
     .catch((err) => console.log(err));
 
-  if (registrationInfo.length === 0) {
+  if (registration_info.length === 0) {
     console.log("수강신청 정보를 찾을 수 없습니다.");
     return res.status(401).json({ message: "수강신청 목록이 없습니다." });
   }
@@ -30,10 +30,13 @@ async function getAllRegistrationInfoById(req, res) {
   res.status(200).json(registration_info);
 }
 
-// POST
+// POST 수강신청
 async function courseRegistration(req, res) {
   const course_id = req.body.course_id;
   const user_id = req.user_id;
+  let is_repetition = false;
+  let course_repeition_date = null;
+
   if (!user_id) {
     console.log("user_id값을 전달받지 못하였습니다.");
     return res.status(401).json({ message: "Invalid Access" });
@@ -47,10 +50,27 @@ async function courseRegistration(req, res) {
     console.log("학생 정보를 찾지 못하였습니다.");
     return res.status(401).json({ message: "Invalid Access" });
   }
-  // registration에서 student_id, course_id찾아서 이미 있으면 재수강값 1로 바꾸기
+
+  // 재수강 여부 확인
+  // 수강 학기와 현재 학기가 같은 경우 재수강x 처리해줘야함
+  const registration_info = await model.registration
+    .findOne({
+      where: { student_id: student_info.student_id, course_id: course_id },
+    })
+    .catch((err) => console.log(err));
+  if (registration_info) {
+    is_repetition = true;
+    course_repeition_date = new Date();
+    console.log(
+      `user_id: ${user_id} ${student_info.name} 학생 course_id: ${course_id} 재수강 신청 완료`
+    );
+  }
+
+  // 수강신청 정보
   const data = {
     registration_date: new Date(),
-    course_repetition_status: 0,
+    course_repetition_status: is_repetition,
+    course_repeition_date: course_repeition_date,
     student_id: student_info.student_id,
     course_id: course_id,
     semester_id: 1,
@@ -61,8 +81,38 @@ async function courseRegistration(req, res) {
 
   res.status(201).json(new_registration_info);
 }
-// DELETE
-async function courseDropping(req, res) {}
+
+// DELETE 수강신청 취소
+async function courseDropping(req, res) {
+  const user_id = req.user_id;
+  const registration_id = req.params.id;
+  const student_info = await model.student
+    .findOne({
+      where: { user_id: user_id },
+    })
+    .catch((err) => console.log(err));
+  if (!student_info) {
+    console.log("학생 정보를 찾지 못하였습니다.");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+  const delete_registration = await model.registration
+    .destroy({
+      where: {
+        registration_id: registration_id,
+        student_id: student_info.student_id,
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({ message: "Server Error" });
+    });
+  if (!delete_registration) {
+    console.log("삭제할 수강신청 정보를 찾을 수 없습니다.");
+    return res.status(404).json({ message: "Invalid Access" });
+  } else {
+    return res.status(200).json({ message: "수강신청이 취소되었습니다." });
+  }
+}
 
 module.exports = {
   getAllRegistrationInfo,

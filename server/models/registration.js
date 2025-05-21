@@ -64,7 +64,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       grade_update_date: {
         type: DataTypes.DATE,
-        defaultValue: sequelize.fn("now"),
+        allowNull: true,
+        defaultValue: null,
       },
       student_id: {
         type: DataTypes.INTEGER,

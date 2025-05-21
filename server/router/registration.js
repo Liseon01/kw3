@@ -12,6 +12,6 @@ const validateCredential = [];
 // router.get("/", isAuth, registrationController.getAllRegistrationInfo); // TEST
 router.get("/", isAuth, registrationController.getAllRegistrationInfoById);
 router.post("/", isAuth, registrationController.courseRegistration);
-router.delete("/", isAuth, registrationController.courseDropping);
+router.delete("/:id", isAuth, registrationController.courseDropping);
 
 module.exports = router;

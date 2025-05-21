@@ -57,7 +57,8 @@ module.exports = {
       },
       grade_update_date: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
+        allowNull: true,
+        defaultValue: null,
       },
       student_id: {
         type: Sequelize.INTEGER,

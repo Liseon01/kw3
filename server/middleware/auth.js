@@ -26,4 +26,24 @@ const isAuth = async (req, res, next) => {
   });
 };
 
-module.exports = { isAuth };
+const isStudent = async (req, res, next) => {
+  const user_id = req.user_id;
+  const user_info = await model.user
+    .findOne({ where: { user_id: user_id } })
+    .catch((err) => {
+      console.log(err);
+      console.log("Sever Error. isStudent");
+      return res.status(500).json({ message: "Server Error" });
+    });
+  if (!user_info) {
+    console.log("유저 정보를 찾을 수 없습니다. function: isStudent");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+  if (user_info.role === "학생") next();
+  else {
+    console.log("사용자가 학생이 아닙니다. function: isStudent");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+};
+
+module.exports = { isAuth, isStudent };

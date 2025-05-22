@@ -39,7 +39,7 @@ const isStudent = async (req, res, next) => {
     console.log("유저 정보를 찾을 수 없습니다. function: isStudent");
     return res.status(401).json({ message: "Invalid Access" });
   }
-  if (user_info.role === "학생") next();
+  if (user_info.role === "student") next();
   else {
     console.log("사용자가 학생이 아닙니다. function: isStudent");
     return res.status(401).json({ message: "Invalid Access" });

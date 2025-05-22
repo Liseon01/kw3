@@ -1,6 +1,8 @@
 const model = require("../models");
+const { Op } = require("sequelize");
 // GET (TEST)
 async function getAllRegistrationInfo(req, res) {}
+
 // GET 수강신청 내역 확인
 async function getAllRegistrationInfoById(req, res) {
   const user_id = req.user_id;
@@ -30,12 +32,13 @@ async function getAllRegistrationInfoById(req, res) {
   res.status(200).json(registration_info);
 }
 
-// POST 수강신청
+// POST 수강신청 (JOIN 필요)
 async function courseRegistration(req, res) {
   const course_id = req.body.course_id;
   const user_id = req.user_id;
-  let is_repetition = false;
-  let course_repeition_date = null;
+  const today = new Date();
+  let is_repetition = false; // 재수강인지
+  let course_repeition_date = null; // 재수강 날짜
 
   if (!user_id) {
     console.log("user_id값을 전달받지 못하였습니다.");
@@ -51,18 +54,45 @@ async function courseRegistration(req, res) {
     return res.status(401).json({ message: "Invalid Access" });
   }
 
-  // 재수강 여부 확인
-  // 수강 학기와 현재 학기가 같은 경우 재수강x 처리해줘야함
+  // 현재 학기 가져오기
+  const current_semester_info = await model.semester.findOne({
+    where: {
+      start_date: { [Op.lte]: today },
+      end_date: { [Op.gte]: today },
+    },
+  });
+  if (!current_semester_info) {
+    console.log("현재 학기 정보가 데이터베이스에 존재하지 않습니다.");
+    return res.status(401).json({ message: "Server Error" });
+  }
+
+  // 재수강 여부
   const registration_info = await model.registration
-    .findOne({
+    .findAll({
       where: { student_id: student_info.student_id, course_id: course_id },
     })
     .catch((err) => console.log(err));
-  if (registration_info) {
-    is_repetition = true;
-    course_repeition_date = new Date();
+  if (registration_info.length != 0) {
+    for (let i = 0; i < registration_info.length; i++) {
+      const semester_id = registration_info[i].semester_id;
+      // 같은학기에 2번이상 같은과목을 수강신청 하면 -> 중복신청
+      if (current_semester_info.semester_id === semester_id) {
+        return res.status(401).json({ message: "이미 수강신청한 과목입니다." });
+      }
+      // 현재학기와 수강신청하는 학기가 다르면 -> 재수강
+      else {
+        is_repetition = true;
+        course_repeition_date = new Date();
+      }
+    }
     console.log(
       `user_id: ${user_id} ${student_info.name} 학생 course_id: ${course_id} 재수강 신청 완료`
+    );
+  }
+  // 수강신청 내역이 존재하지 않으면
+  else {
+    console.log(
+      `user_id: ${user_id} ${student_info.name} 학생 course_id: ${course_id} 수강 신청 완료`
     );
   }
 
@@ -73,7 +103,7 @@ async function courseRegistration(req, res) {
     course_repeition_date: course_repeition_date,
     student_id: student_info.student_id,
     course_id: course_id,
-    semester_id: 1,
+    semester_id: current_semester_info.semester_id,
   };
   const new_registration_info = await model.registration
     .create(data)

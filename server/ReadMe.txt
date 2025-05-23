@@ -36,3 +36,8 @@ bulkInsert()는 그것을 따르지 않고 그냥 명시된 값만 insert합니�
 
 <Datatypes.TIME>
 문자열 "HH:MM:SS"형식으로 작성해야함
+
+
+커밋할때 [branch명] 수정한파일 수정내용
+
+<Postman 한글 인코딩 필수>

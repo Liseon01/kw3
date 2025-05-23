@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("1", "2", "3"),
         allowNull: false,
       },
+      current_enrollment: {
+        type: DataTypes.TINYINT.UNSIGNED,
+        allowNull: false,
+        defaultValue: 0,
+      },
       max_enrollment: {
         type: DataTypes.TINYINT.UNSIGNED,
         allowNull: false,

@@ -2,10 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
-const authRouter = require("./router/auth.js");
-const registrationRouter = require("./router/registration.js");
 const config = require("./configs/config.js");
 const Sequelize = require("sequelize");
+
+// Router
+const authRouter = require("./router/auth.js");
+const registrationRouter = require("./router/registration.js");
+const courseRouter = require("./router/course.js");
+const collegeRouter = require("./router/college.js");
 
 const app = express();
 const sequelize = new Sequelize(
@@ -19,6 +23,8 @@ app.use(morgan("tiny"));
 
 app.use("/auth", authRouter);
 app.use("/registration", registrationRouter);
+app.use("/course", courseRouter);
+app.use("/college", collegeRouter);
 
 app.use((req, res, next) => {
   res.sendStatus(404);

@@ -9,11 +9,10 @@ const router = express.Router();
 const validateCredential = [];
 
 // GET 모든 대학정보 주기
-router.get("/", isAuth, isStudent, collegeController.getALLCollegeInfo);
+router.get("/", isAuth, collegeController.getALLCollegeInfo);
 router.get(
   "/:college_id/departments",
   isAuth,
-  isStudent,
   collegeController.getDepartmentInfoByCollegeId
 );
 

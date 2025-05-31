@@ -56,6 +56,7 @@ module.exports = {
       current_enrollments: {
         type: Sequelize.TINYINT.UNSIGNED,
         allowNull: false,
+        defaultValue: 0,
       },
       course_classroom: {
         type: Sequelize.STRING,
@@ -63,7 +64,7 @@ module.exports = {
       },
       syllabus_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       semester_id: {
         type: Sequelize.INTEGER,

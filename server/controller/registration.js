@@ -34,7 +34,7 @@ async function getAllRegistrationInfoById(req, res) {
 
 // POST 수강신청 (JOIN 필요)
 async function courseRegistration(req, res) {
-  const course_id = req.body.course_id;
+  const course_assignment_id = req.body.course_assignment_id;
   const user_id = req.user_id;
   const today = new Date();
   let is_repetition = false; // 재수강인지
@@ -69,7 +69,10 @@ async function courseRegistration(req, res) {
   // 재수강 여부
   const registration_info = await model.registration
     .findAll({
-      where: { student_id: student_info.student_id, course_id: course_id },
+      where: {
+        student_id: student_info.student_id,
+        course_assignment_id: course_assignment_id,
+      },
     })
     .catch((err) => console.log(err));
   if (registration_info.length != 0) {
@@ -86,13 +89,13 @@ async function courseRegistration(req, res) {
       }
     }
     console.log(
-      `user_id: ${user_id} ${student_info.name} 학생 course_id: ${course_id} 재수강 신청 완료`
+      `user_id: ${user_id} ${student_info.name} 학생 course_assignment_id: ${course_assignment_id} 재수강 신청 완료`
     );
   }
   // 수강신청 내역이 존재하지 않으면
   else {
     console.log(
-      `user_id: ${user_id} ${student_info.name} 학생 course_id: ${course_id} 수강 신청 완료`
+      `user_id: ${user_id} ${student_info.name} 학생 course_assignment_id: ${course_assignment_id} 수강 신청 완료`
     );
   }
 
@@ -102,7 +105,7 @@ async function courseRegistration(req, res) {
     course_repetition_status: is_repetition,
     course_repeition_date: course_repeition_date,
     student_id: student_info.student_id,
-    course_id: course_id,
+    course_assignment_id: course_assignment_id,
     semester_id: current_semester_info.semester_id,
   };
   const new_registration_info = await model.registration

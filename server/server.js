@@ -10,6 +10,7 @@ const authRouter = require("./router/auth.js");
 const registrationRouter = require("./router/registration.js");
 const courseRouter = require("./router/course.js");
 const collegeRouter = require("./router/college.js");
+const courseAssignmentRouter = require("./router/course_assignment.js");
 
 const app = express();
 const sequelize = new Sequelize(
@@ -25,6 +26,7 @@ app.use("/auth", authRouter);
 app.use("/registration", registrationRouter);
 app.use("/course", courseRouter);
 app.use("/college", collegeRouter);
+app.use("/courseAssignment", courseAssignmentRouter);
 
 app.use((req, res, next) => {
   res.sendStatus(404);

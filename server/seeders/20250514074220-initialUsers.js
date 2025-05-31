@@ -9,7 +9,10 @@ module.exports = {
     const pwd2 = await bcrypt.hash("124", 12);
     const pwd3 = await bcrypt.hash("12345", 12);
     const pwd4 = await bcrypt.hash("123456", 12);
-
+    const pwd5 = await bcrypt.hash("1234567", 12);
+    await queryInterface.sequelize.query(
+      "ALTER TABLE users AUTO_INCREMENT = 1"
+    );
     await queryInterface.bulkInsert("users", [
       {
         id_num: "2019202073",
@@ -36,7 +39,7 @@ module.exports = {
         password_hashed: pwd3,
         identity_num: "0000000000003",
         last_login_date: new Date(),
-        role: "professor",
+        role: "student",
         is_active_verified: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -47,6 +50,16 @@ module.exports = {
         identity_num: "0000000000004",
         last_login_date: new Date(),
         role: "student",
+        is_active_verified: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id_num: "11112222",
+        password_hashed: pwd5,
+        identity_num: "0000000000005",
+        last_login_date: new Date(),
+        role: "professor",
         is_active_verified: true,
         createdAt: new Date(),
         updatedAt: new Date(),

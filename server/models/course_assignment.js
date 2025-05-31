@@ -8,7 +8,35 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      course_assignment.belongsTo(models.syllabus, {
+        foreignKey: "syllabus_id",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
+      });
+
+      course_assignment.belongsTo(models.semester, {
+        foreignKey: "semester_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
+      course_assignment.belongsTo(models.professor, {
+        foreignKey: "professor_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
+      course_assignment.belongsTo(models.course, {
+        foreignKey: "course_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
+      course_assignment.belongsTo(models.department, {
+        foreignKey: "department_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
     }
   }
   course_assignment.init(
@@ -70,6 +98,7 @@ module.exports = (sequelize, DataTypes) => {
       current_enrollments: {
         type: DataTypes.TINYINT.UNSIGNED,
         allowNull: false,
+        defaultValue: 0,
         validate: {
           min: 0,
           max: 255,
@@ -81,7 +110,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       syllabus_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       semester_id: {
         type: DataTypes.INTEGER,

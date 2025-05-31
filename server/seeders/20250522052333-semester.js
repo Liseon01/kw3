@@ -3,6 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    await queryInterface.sequelize.query(
+      "ALTER TABLE semesters AUTO_INCREMENT = 1"
+    );
     await queryInterface.bulkInsert("semesters", [
       {
         semester_classification: "1학기",

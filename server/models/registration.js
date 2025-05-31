@@ -8,7 +8,21 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      registration.belongsTo(models.student, {
+        foreignKey: "student_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+      registration.belongsTo(models.course_assignment, {
+        foreignKey: "course_assignment_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+      registration.belongsTo(models.semester, {
+        foreignKey: "semester_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
     }
   }
   registration.init(

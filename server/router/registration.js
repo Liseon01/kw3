@@ -8,8 +8,6 @@ const router = express.Router();
 
 const validateCredential = [];
 
-// isAuth에서 req.user_id를 넘겨줌
-// router.get("/", isAuth, registrationController.getAllRegistrationInfo); // TEST
 router.get(
   "/",
   isAuth,
@@ -17,7 +15,7 @@ router.get(
   registrationController.getAllRegistrationInfoById
 );
 router.get(
-  "/schedule",
+  "/schedule/:id",
   isAuth,
   isStudent,
   registrationController.getAllScheduleById

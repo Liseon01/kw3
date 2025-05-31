@@ -33,6 +33,7 @@ async function getAllRegistrationInfoById(req, res) {
 // GET 시간표 불러오기
 async function getAllScheduleById(req, res) {
   const user_id = req.user_id;
+  const semester_id = req.params.id;
   if (!user_id) {
     console.log("user_id값을 전달받지 못하였습니다.");
     return res.status(401).json({ message: "Invalid Access" });
@@ -48,7 +49,7 @@ async function getAllScheduleById(req, res) {
   }
 
   const registration_info = await model.registration.findAll({
-    where: { student_id: student_info.student_id }, // student_id로 찾은것중에
+    where: { student_id: student_info.student_id, semester_id: semester_id }, // student_id로 찾은것중에
     include: [
       {
         model: model.course_assignment,

@@ -22,9 +22,12 @@ npx sequelize-cli db:seed:undo --seed 20250519061618-Student.js
 Sequelize bulkInsert()는 defaultValue를 무시함
 Sequelize에서 seeder를 실행할 때 주로 사용하는 bulkInsert()는 모델의 defaultValue나 제약 조건을 적용하지 않습니다.
 
+
+validate는 model에 작성하는것임. migration파일에는 validate작성 ❌
+
 즉, admission_type을 직접 넣지 않으면, null이 들어갑니다. 이것은 Sequelize의 알려진 동작 방식입니다.
 
-✅ migration 파일의 defaultValue는 DB 스키마에만 영향을 줍니다.
+migration 파일의 defaultValue는 DB 스키마에만 영향을 줍니다.
 bulkInsert()는 그것을 따르지 않고 그냥 명시된 값만 insert합니다.
 
 
@@ -41,3 +44,4 @@ bulkInsert()는 그것을 따르지 않고 그냥 명시된 값만 insert합니�
 커밋할때 [branch명] 수정한파일 수정내용
 
 <Postman 한글 인코딩 필수>
+

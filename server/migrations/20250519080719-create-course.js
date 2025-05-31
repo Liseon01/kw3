@@ -21,18 +21,6 @@ module.exports = {
         type: Sequelize.ENUM("1", "2", "3"),
         allowNull: false,
       },
-      max_enrollment: {
-        type: Sequelize.TINYINT.UNSIGNED,
-        allowNull: false,
-      },
-      course_start_time: {
-        type: Sequelize.TIME,
-        allowNull: false,
-      },
-      course_end_time: {
-        type: Sequelize.TIME,
-        allowNull: false,
-      },
       course_level: {
         type: Sequelize.ENUM("1", "2", "3", "4"),
         allowNull: false,
@@ -44,27 +32,6 @@ module.exports = {
       prerequisite: {
         type: Sequelize.INTEGER,
         allowNull: true,
-      },
-      course_establish_date: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      course_cancel_date: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: null,
-      },
-      course_status: {
-        type: Sequelize.ENUM("개강", "폐강"),
-        allowNull: false,
-      },
-      department_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      professor_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
       },
       createdAt: {
         allowNull: false,

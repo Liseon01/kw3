@@ -52,13 +52,13 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: null,
       },
-      grade: {
-        type: DataTypes.ENUM("A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"),
+      attitude_score: {
+        type: DataTypes.TINYINT.UNSIGNED,
         allowNull: true,
         defaultValue: null,
       },
-      grade_num: {
-        type: DataTypes.DOUBLE,
+      grade: {
+        type: DataTypes.ENUM("A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"),
         allowNull: true,
         defaultValue: null,
       },
@@ -71,7 +71,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      course_id: {
+      course_assignment_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

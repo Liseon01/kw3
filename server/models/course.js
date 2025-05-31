@@ -31,23 +31,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("1", "2", "3"),
         allowNull: false,
       },
-      current_enrollment: {
-        type: DataTypes.TINYINT.UNSIGNED,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      max_enrollment: {
-        type: DataTypes.TINYINT.UNSIGNED,
-        allowNull: false,
-      },
-      course_start_time: {
-        type: DataTypes.TIME,
-        allowNull: false,
-      },
-      course_end_time: {
-        type: DataTypes.TIME,
-        allowNull: false,
-      },
       course_level: {
         type: DataTypes.ENUM("1", "2", "3", "4"),
         allowNull: false,
@@ -59,27 +42,6 @@ module.exports = (sequelize, DataTypes) => {
       prerequisite: {
         type: DataTypes.INTEGER,
         allowNull: true,
-      },
-      course_establish_date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      course_cancel_date: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        defaultValue: null,
-      },
-      course_status: {
-        type: DataTypes.ENUM("개강", "폐강"),
-        allowNull: false,
-      },
-      department_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      professor_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
       },
       createdAt: {
         allowNull: false,

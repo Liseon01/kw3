@@ -201,27 +201,7 @@ export default function CoursesPage() {
 
         <div className="mt-8 border-t pt-4">
           <div className="flex overflow-x-auto gap-4 pb-2">
-            <Button variant="outline" size="sm">
-              학정번호
-            </Button>
-            <Button variant="outline" size="sm">
-              과목명
-            </Button>
-            <Button variant="outline" size="sm">
-              이수 구분
-            </Button>
-            <Button variant="outline" size="sm">
-              학점/시간
-            </Button>
-            <Button variant="outline" size="sm">
-              교수명
-            </Button>
-            <Button variant="outline" size="sm">
-              강의실
-            </Button>
-            <Button variant="outline" size="sm">
-              강의링크(everytime.kr)
-            </Button>
+            
           </div>
         </div>
       </main>

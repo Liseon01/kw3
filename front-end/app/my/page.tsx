@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,45 +33,73 @@ export default function MyPage() {
     setUserInfo((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Password validation
+    // 비밀번호 유효성 검사
     if (userInfo.newPassword) {
       if (userInfo.newPassword !== userInfo.confirmPassword) {
         setPasswordError("비밀번호가 일치하지 않습니다.")
         return
       }
-
       if (!userInfo.previousPassword) {
         setPasswordError("현재 비밀번호를 입력해주세요.")
         return
       }
     }
 
-    // 벡엔드 연결지점?
     setPasswordError("")
 
-    // 페스워드 리셋 필드
-    setUserInfo((prev) => ({
-      ...prev,
-      previousPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    }))
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        alert("로그인이 필요합니다.")
+        return
+      }
 
-    alert("정보가 성공적으로 업데이트되었습니다.")
+      const res = await fetch("http://localhost:7070/user/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...userInfo,
+          passwordUpdate: userInfo.newPassword
+            ? {
+                previousPassword: userInfo.previousPassword,
+                newPassword: userInfo.newPassword,
+              }
+            : null,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        alert(err.message || "정보 업데이트에 실패했습니다.")
+        return
+      }
+
+      alert("정보가 성공적으로 업데이트되었습니다.")
+      setUserInfo((prev) => ({
+        ...prev,
+        previousPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      }))
+    } catch (err) {
+      console.error("업데이트 중 오류 발생:", err)
+      alert("서버 오류가 발생했습니다.")
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-
       <main className="flex-1 container px-4 py-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">MY(내 정보 관리)</h1>
         </div>
-
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-xl">내정보수정</CardTitle>
@@ -80,112 +107,31 @@ export default function MyPage() {
           <CardContent>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="koreanName" className="font-medium">
-                    한글이름
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="koreanName" name="koreanName" value={userInfo.koreanName} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="englishName" className="font-medium">
-                    영문이름
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="englishName" name="englishName" value={userInfo.englishName} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="birthday" className="font-medium">
-                    생일
-                  </Label>
-                  <div className="col-span-4">
-                    <Input
-                      id="birthday"
-                      name="birthday"
-                      type="date"
-                      value={userInfo.birthday}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="phoneNumber" className="font-medium">
-                    전화번호
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="phoneNumber" name="phoneNumber" value={userInfo.phoneNumber} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="mobilePhone" className="font-medium">
-                    휴대폰
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="mobilePhone" name="mobilePhone" value={userInfo.mobilePhone} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="email" className="font-medium">
-                    e-mail
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="email" name="email" type="email" value={userInfo.email} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="bankAccount" className="font-medium">
-                    은행/계좌번호
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="bankAccount" name="bankAccount" value={userInfo.bankAccount} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="postalCode" className="font-medium">
-                    우편번호
-                  </Label>
-                  <div className="col-span-4">
-                    <div className="flex gap-2">
+                {[
+                  ["koreanName", "한글이름"],
+                  ["englishName", "영문이름"],
+                  ["birthday", "생일", "date"],
+                  ["phoneNumber", "전화번호"],
+                  ["mobilePhone", "휴대폰"],
+                  ["email", "e-mail", "email"],
+                  ["bankAccount", "은행/계좌번호"],
+                  ["postalCode", "우편번호"],
+                  ["address1", "주소1(도/구/시/본부대)"],
+                  ["address2", "주소2(동/아파트)"],
+                ].map(([field, label, type = "text"]) => (
+                  <div key={field} className="grid grid-cols-5 items-center border-b pb-2">
+                    <Label htmlFor={field} className="font-medium">{label}</Label>
+                    <div className="col-span-4">
                       <Input
-                        id="postalCode"
-                        name="postalCode"
-                        value={userInfo.postalCode}
+                        id={field}
+                        name={field}
+                        type={type}
+                        value={(userInfo as any)[field]}
                         onChange={handleChange}
-                        className="max-w-[200px]"
                       />
-                      <Button type="button" variant="outline">
-                        우편번호 검색
-                      </Button>
                     </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="address1" className="font-medium">
-                    주소1(도/구/시/본부대)
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="address1" name="address1" value={userInfo.address1} onChange={handleChange} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 items-center border-b pb-2">
-                  <Label htmlFor="address2" className="font-medium">
-                    주소2(동/아파트)
-                  </Label>
-                  <div className="col-span-4">
-                    <Input id="address2" name="address2" value={userInfo.address2} onChange={handleChange} />
-                  </div>
-                </div>
+                ))}
 
                 <div className="grid grid-cols-5 items-center border-b pb-2">
                   <Label className="font-medium">스마트 인증 관리</Label>
@@ -199,43 +145,34 @@ export default function MyPage() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <h3 className="font-medium mb-4">현재 비밀번호</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <Input
-                          id="previousPassword"
-                          name="previousPassword"
-                          type="password"
-                          placeholder="현재 비밀번호 입력"
-                          value={userInfo.previousPassword}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
+                    <Input
+                      id="previousPassword"
+                      name="previousPassword"
+                      type="password"
+                      placeholder="현재 비밀번호 입력"
+                      value={userInfo.previousPassword}
+                      onChange={handleChange}
+                    />
                   </div>
-
                   <div>
                     <h3 className="font-medium mb-4">비밀번호 확인</h3>
                     <div className="space-y-4">
-                      <div>
-                        <Input
-                          id="newPassword"
-                          name="newPassword"
-                          type="password"
-                          placeholder="새 비밀번호 입력"
-                          value={userInfo.newPassword}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div>
-                        <Input
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type="password"
-                          placeholder="비밀번호 확인 입력"
-                          value={userInfo.confirmPassword}
-                          onChange={handleChange}
-                        />
-                      </div>
+                      <Input
+                        id="newPassword"
+                        name="newPassword"
+                        type="password"
+                        placeholder="새 비밀번호 입력"
+                        value={userInfo.newPassword}
+                        onChange={handleChange}
+                      />
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="비밀번호 확인 입력"
+                        value={userInfo.confirmPassword}
+                        onChange={handleChange}
+                      />
                       <div className="text-sm text-gray-500">
                         ※ 안전거래를 위해 8자 이상 특수문자(@#$^+=-)를 포함하세요
                       </div>

@@ -86,43 +86,6 @@ export default function RegistrationPage() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="year" className="block mb-2 text-sm">
-                년도
-              </Label>
-              <Select defaultValue={searchParams.year} onValueChange={(value) => handleSelectChange("year", value)}>
-                <SelectTrigger id="year" className="w-full">
-                  <SelectValue placeholder="년도 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="semester" className="block mb-2 text-sm">
-                학기
-              </Label>
-              <Select
-                defaultValue={searchParams.semester}
-                onValueChange={(value) => handleSelectChange("semester", value)}
-              >
-                <SelectTrigger id="semester" className="w-full">
-                  <SelectValue placeholder="학기 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1학기">1학기</SelectItem>
-                  <SelectItem value="2학기">2학기</SelectItem>
-                  <SelectItem value="여름학기">여름학기</SelectItem>
-                  <SelectItem value="겨울학기">겨울학기</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
               <Label htmlFor="college" className="block mb-2 text-sm">
                 대학
               </Label>

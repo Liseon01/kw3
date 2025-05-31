@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -16,20 +15,47 @@ export default function LoginForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log("로그인 시도 중..."); 
 
-    // Simple validation
-    if (!username || !password) {
-      setError("아이디와 비밀번호를 입력해주세요.")
-      return
-    }
-
-    // In a real application, you would validate credentials against a backend
-    // For demo purposes, we'll just redirect to the dashboard
-    router.push("/dashboard")
+  if (!username || !password) {
+    setError("아이디와 비밀번호를 입력해주세요.");
+    return;
   }
 
+  try {
+    console.log("fetch 요청 보냄..."); 
+
+    const res = await fetch("http://localhost:7070/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_num: username,
+        password: password,
+      }),
+    });
+
+    console.log("응답 받음");
+
+    if (!res.ok) {
+      const err = await res.json();
+      setError(err.message || "로그인에 실패했습니다.");
+      return;
+    }
+
+    const data = await res.json();
+    console.log("로그인 성공:", data);
+
+    localStorage.setItem("token", data.token);
+    router.push("/dashboard");
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("서버 오류가 발생했습니다.");
+  }
+};
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">

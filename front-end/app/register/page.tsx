@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -32,10 +31,9 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, department: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Simple validation
     if (!formData.name || !formData.studentId || !formData.email || !formData.password || !formData.department) {
       setError("모든 필드를 입력해주세요.")
       return
@@ -46,9 +44,35 @@ export default function RegisterPage() {
       return
     }
 
-    // 백엔드 연결 지점?
-    // 로그인 지점
-    router.push("/")
+    setError("")
+
+    try {
+      const res = await fetch("http://localhost:7070/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          studentId: formData.studentId,
+          email: formData.email,
+          password: formData.password,
+          department: formData.department,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        setError(err.message || "회원가입에 실패했습니다.")
+        return
+      }
+
+      alert("회원가입이 완료되었습니다.")
+      router.push("/") // 로그인 페이지로 이동
+    } catch (err) {
+      console.error("Register error:", err)
+      setError("서버 오류가 발생했습니다.")
+    }
   }
 
   return (

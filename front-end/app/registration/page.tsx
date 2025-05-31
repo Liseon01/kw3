@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -16,7 +15,7 @@ export default function RegistrationPage() {
     year: "2025",
     semester: "1학기",
     college: "공과대학",
-    major: "컴퓨터공학",
+    major: "코메터공학",
     courseName: "",
     professorName: "",
   })
@@ -33,66 +32,74 @@ export default function RegistrationPage() {
     setSearchParams((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 실제 구현에서는 API 호출을 통해 강의 정보를 가져온다.
-    const mockResults = [
-      {
-        id: "CS101",
-        name: "컴퓨터 프로그래밍",
-        professor: "김교수",
-        credit: 3,
-        time: "월 10:30-12:00, 수 10:30-12:00",
-        room: "새빛관 401",
-        capacity: 40,
-        registered: 32,
-      },
-      {
-        id: "CS201",
-        name: "자료구조",
-        professor: "이교수",
-        credit: 3,
-        time: "화 13:00-14:30, 목 13:00-14:30",
-        room: "비마관 202",
-        capacity: 35,
-        registered: 30,
-      },
-      {
-        id: "CS301",
-        name: "알고리즘",
-        professor: "박교수",
-        credit: 3,
-        time: "월 15:00-16:30, 수 15:00-16:30",
-        room: "새빛관 505",
-        capacity: 30,
-        registered: 28,
-      },
-    ]
+    try {
+      const query = new URLSearchParams({
+        year: searchParams.year,
+        semester: searchParams.semester,
+        college: searchParams.college,
+        major: searchParams.major,
+        courseName: searchParams.courseName,
+        professorName: searchParams.professorName,
+      }).toString()
 
-    setSearchResults(mockResults)
-    setIsSearched(true)
+      const res = await fetch(`http://localhost:7070/courses/search?${query}`)
+
+      if (!res.ok) {
+        throw new Error("강의 목록 조회 실패")
+      }
+
+      const data = await res.json()
+      setSearchResults(data)
+      setIsSearched(true)
+    } catch (err) {
+      console.error("검색 중 오류:", err)
+      setSearchResults([])
+      setIsSearched(true)
+    }
   }
 
-  const handleRegister = (courseId: string) => {
-    alert(`${courseId} 과목이 수강신청 되었습니다.`)
+  const handleRegister = async (courseId: string) => {
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        alert("로그인이 필요합니다.")
+        return
+      }
+
+      const res = await fetch("http://localhost:7070/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ courseAssignmentId: courseId }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        alert(err.message || "수강신청 실패")
+        return
+      }
+
+      alert(`${courseId} 과목이 수강신청 되었습니다.`)
+    } catch (err) {
+      console.error("신청 중 오류:", err)
+      alert("서버 오류가 발생했습니다.")
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-
       <main className="flex-1 container px-4 py-6">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="college" className="block mb-2 text-sm">
-                대학
-              </Label>
-              <Select
-                defaultValue={searchParams.college}
-                onValueChange={(value) => handleSelectChange("college", value)}
-              >
+              <Label htmlFor="college" className="block mb-2 text-sm">대학</Label>
+              <Select defaultValue={searchParams.college} onValueChange={(value) => handleSelectChange("college", value)}>
                 <SelectTrigger id="college" className="w-full">
                   <SelectValue placeholder="대학 선택" />
                 </SelectTrigger>
@@ -104,84 +111,46 @@ export default function RegistrationPage() {
                 </SelectContent>
               </Select>
             </div>
-
             <div>
-              <Label htmlFor="major" className="block mb-2 text-sm">
-                전공
-              </Label>
+              <Label htmlFor="major" className="block mb-2 text-sm">전공</Label>
               <Select defaultValue={searchParams.major} onValueChange={(value) => handleSelectChange("major", value)}>
                 <SelectTrigger id="major" className="w-full">
                   <SelectValue placeholder="전공 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="컴퓨터공학">컴퓨터공학</SelectItem>
+                  <SelectItem value="코메터공학">코메터공학</SelectItem>
                   <SelectItem value="전자공학">전자공학</SelectItem>
                   <SelectItem value="소프트웨어학">소프트웨어학</SelectItem>
-                  <SelectItem value="정보융합학">정보융합학</SelectItem>
+                  <SelectItem value="정보육합학">정보육합학</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
             <div>
-              <Label htmlFor="courseName" className="block mb-2 text-sm">
-                과목명
-              </Label>
-              <Input
-                id="courseName"
-                name="courseName"
-                placeholder="과목명을 입력하세요"
-                value={searchParams.courseName}
-                onChange={handleInputChange}
-              />
+              <Label htmlFor="courseName" className="block mb-2 text-sm">과목명</Label>
+              <Input id="courseName" name="courseName" placeholder="과목명을 입력하세요" value={searchParams.courseName} onChange={handleInputChange} />
             </div>
-
             <div>
-              <Label htmlFor="professorName" className="block mb-2 text-sm">
-                교수명
-              </Label>
-              <Input
-                id="professorName"
-                name="professorName"
-                placeholder="교수명을 입력하세요"
-                value={searchParams.professorName}
-                onChange={handleInputChange}
-              />
+              <Label htmlFor="professorName" className="block mb-2 text-sm">교수명</Label>
+              <Input id="professorName" name="professorName" placeholder="교수명을 입력하세요" value={searchParams.professorName} onChange={handleInputChange} />
             </div>
-
             <div className="md:col-span-2 flex justify-center mt-2">
-              <Button type="submit" className="bg-rose-600 hover:bg-rose-700 px-8">
-                조회
-              </Button>
+              <Button type="submit" className="bg-rose-600 hover:bg-rose-700 px-8">조회</Button>
             </div>
           </form>
         </div>
-
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="border-b">
             <Tabs defaultValue="all" className="w-full">
               <TabsList className="w-full justify-start h-12 bg-gray-50 rounded-none p-0">
-                <TabsTrigger value="all" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  학수번호
-                </TabsTrigger>
-                <TabsTrigger value="course" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  과목명
-                </TabsTrigger>
-                <TabsTrigger value="professor" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  강의명
-                </TabsTrigger>
-                <TabsTrigger value="department" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  대학명
-                </TabsTrigger>
-                <TabsTrigger value="major" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  전공
-                </TabsTrigger>
-                <TabsTrigger value="credit" className="flex-1 data-[state=active]:bg-white rounded-none h-full">
-                  학점
-                </TabsTrigger>
+                <TabsTrigger value="all" className="flex-1 data-[state=active]:bg-white rounded-none h-full">학수번호</TabsTrigger>
+                <TabsTrigger value="course" className="flex-1 data-[state=active]:bg-white rounded-none h-full">과목명</TabsTrigger>
+                <TabsTrigger value="professor" className="flex-1 data-[state=active]:bg-white rounded-none h-full">강의명</TabsTrigger>
+                <TabsTrigger value="department" className="flex-1 data-[state=active]:bg-white rounded-none h-full">대학명</TabsTrigger>
+                <TabsTrigger value="major" className="flex-1 data-[state=active]:bg-white rounded-none h-full">전공</TabsTrigger>
+                <TabsTrigger value="credit" className="flex-1 data-[state=active]:bg-white rounded-none h-full">학점</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
-
           {isSearched ? (
             <div className="p-4">
               <Table>
@@ -211,11 +180,7 @@ export default function RegistrationPage() {
                         {course.registered}/{course.capacity}
                       </TableCell>
                       <TableCell className="text-center">
-                        <Button
-                          size="sm"
-                          className="bg-rose-600 hover:bg-rose-700"
-                          onClick={() => handleRegister(course.id)}
-                        >
+                        <Button size="sm" className="bg-rose-600 hover:bg-rose-700" onClick={() => handleRegister(course.id)}>
                           신청
                         </Button>
                       </TableCell>
@@ -226,7 +191,7 @@ export default function RegistrationPage() {
             </div>
           ) : (
             <div className="p-8 text-center text-gray-500">
-              <p>* 조회된 강좌가 없습니다. 조건을 변경하여 다시 조회해 주세요.</p>
+              <p>* 조회된 강자가 없습니다. 조건을 변경해서 다시 조회해 주세요.</p>
             </div>
           )}
         </div>

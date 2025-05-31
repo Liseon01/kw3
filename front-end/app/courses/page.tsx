@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Header from "@/components/header"
 import { Input } from "@/components/ui/input"
@@ -23,6 +22,9 @@ export default function CoursesPage() {
     major: "",
   })
 
+  const [courses, setCourses] = useState<any[]>([])
+  const [error, setError] = useState("")
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setSearchParams((prev) => ({ ...prev, [name]: value }))
@@ -36,40 +38,51 @@ export default function CoursesPage() {
     setSearchParams((prev) => ({ ...prev, courseType: value }))
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("검색 파라미터:", searchParams)
-    // 실제 구현에서는 여기서 API 호출을 통해 강의 정보를 가져옵니다
+    try {
+      const res = await fetch("http://localhost:7070/courses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(searchParams),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        setError(err.message || "강의 정보를 불러오지 못했습니다.")
+        return
+      }
+
+      const data = await res.json()
+      setCourses(data)
+      setError("")
+    } catch (err) {
+      console.error(err)
+      setError("서버 요청 중 오류가 발생했습니다.")
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-
       <main className="flex-1 container px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <span className="text-gray-700">▼</span> 강의 정보 조회 시스템
           </h1>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="rounded-full">
-              ⚙️
-            </Button>
-          </div>
         </div>
 
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSearch} className="space-y-6">
+              {/* 필드 입력 영역 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="year" className="block mb-2">
-                    년도
-                  </Label>
+                  <Label htmlFor="year">년도</Label>
                   <Select onValueChange={(value) => handleSelectChange("year", value)}>
-                    <SelectTrigger id="year" className="w-full">
-                      <SelectValue placeholder="년도 선택" />
-                    </SelectTrigger>
+                    <SelectTrigger id="year"><SelectValue placeholder="년도 선택" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="2025">2025</SelectItem>
                       <SelectItem value="2024">2024</SelectItem>
@@ -78,15 +91,10 @@ export default function CoursesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-
                 <div>
-                  <Label htmlFor="semester" className="block mb-2">
-                    학기
-                  </Label>
+                  <Label htmlFor="semester">학기</Label>
                   <Select onValueChange={(value) => handleSelectChange("semester", value)}>
-                    <SelectTrigger id="semester" className="w-full">
-                      <SelectValue placeholder="학기 선택" />
-                    </SelectTrigger>
+                    <SelectTrigger id="semester"><SelectValue placeholder="학기 선택" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">1학기</SelectItem>
                       <SelectItem value="2">2학기</SelectItem>
@@ -98,29 +106,13 @@ export default function CoursesPage() {
               </div>
 
               <div>
-                <Label htmlFor="courseName" className="block mb-2">
-                  과목명
-                </Label>
-                <Input
-                  id="courseName"
-                  name="courseName"
-                  placeholder="과목명을 입력하세요"
-                  value={searchParams.courseName}
-                  onChange={handleInputChange}
-                />
+                <Label htmlFor="courseName">과목명</Label>
+                <Input id="courseName" name="courseName" placeholder="과목명을 입력하세요" value={searchParams.courseName} onChange={handleInputChange} />
               </div>
 
               <div>
-                <Label htmlFor="professorName" className="block mb-2">
-                  교수명
-                </Label>
-                <Input
-                  id="professorName"
-                  name="professorName"
-                  placeholder="교수명을 입력하세요"
-                  value={searchParams.professorName}
-                  onChange={handleInputChange}
-                />
+                <Label htmlFor="professorName">교수명</Label>
+                <Input id="professorName" name="professorName" placeholder="교수명을 입력하세요" value={searchParams.professorName} onChange={handleInputChange} />
               </div>
 
               <div>
@@ -138,13 +130,9 @@ export default function CoursesPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="commonCourse" className="block mb-2">
-                    공통 과목
-                  </Label>
+                  <Label htmlFor="commonCourse">공통 과목</Label>
                   <Select onValueChange={(value) => handleSelectChange("commonCourse", value)}>
-                    <SelectTrigger id="commonCourse" className="w-full">
-                      <SelectValue placeholder="- 전체 -" />
-                    </SelectTrigger>
+                    <SelectTrigger id="commonCourse"><SelectValue placeholder="- 전체 -" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">- 전체 -</SelectItem>
                       <SelectItem value="required">필수 과목</SelectItem>
@@ -154,13 +142,9 @@ export default function CoursesPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="department" className="block mb-2">
-                    학과
-                  </Label>
+                  <Label htmlFor="department">학과</Label>
                   <Select onValueChange={(value) => handleSelectChange("department", value)}>
-                    <SelectTrigger id="department" className="w-full">
-                      <SelectValue placeholder="- 전체 -" />
-                    </SelectTrigger>
+                    <SelectTrigger id="department"><SelectValue placeholder="- 전체 -" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">- 전체 -</SelectItem>
                       <SelectItem value="computer">컴퓨터공학과</SelectItem>
@@ -173,13 +157,9 @@ export default function CoursesPage() {
               </div>
 
               <div>
-                <Label htmlFor="major" className="block mb-2">
-                  전공
-                </Label>
+                <Label htmlFor="major">전공</Label>
                 <Select onValueChange={(value) => handleSelectChange("major", value)}>
-                  <SelectTrigger id="major" className="w-full">
-                    <SelectValue placeholder="- 전체 -" />
-                  </SelectTrigger>
+                  <SelectTrigger id="major"><SelectValue placeholder="- 전체 -" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">- 전체 -</SelectItem>
                     <SelectItem value="ai">인공지능</SelectItem>
@@ -199,10 +179,26 @@ export default function CoursesPage() {
           </CardContent>
         </Card>
 
+        {/* 검색 결과 출력 */}
         <div className="mt-8 border-t pt-4">
-          <div className="flex overflow-x-auto gap-4 pb-2">
-            
-          </div>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {courses.length > 0 ? (
+            <div className="grid gap-4">
+              {courses.map((course, index) => (
+                <Card key={index}>
+                  <CardContent className="p-4 space-y-2">
+                    <h3 className="text-lg font-bold">{course.name}</h3>
+                    <p>교수: {course.professor}</p>
+                    <p>과목코드: {course.code}</p>
+                    <p>학점: {course.credits}</p>
+                    <p>이수구분: {course.type}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">검색 결과가 없습니다.</p>
+          )}
         </div>
       </main>
     </div>

@@ -1,7 +1,6 @@
 const model = require("../models");
 const { Op } = require("sequelize");
-// GET (TEST)
-async function getAllRegistrationInfo(req, res) {}
+const course_assignment = require("../models/course_assignment");
 
 // GET 수강신청 내역 확인
 async function getAllRegistrationInfoById(req, res) {
@@ -30,6 +29,63 @@ async function getAllRegistrationInfoById(req, res) {
   }
 
   res.status(200).json(registration_info);
+}
+
+// GET 시간표 불러오기
+async function getAllScheduleById(req, res) {
+  const user_id = req.user_id;
+  if (!user_id) {
+    console.log("user_id값을 전달받지 못하였습니다.");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+  const student_info = await model.student
+    .findOne({
+      where: { user_id: user_id },
+    })
+    .catch((err) => console.log(err));
+  if (!student_info) {
+    console.log("학생 정보를 찾지 못하였습니다.");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+
+  const registration_info = await model.registration.findAll({
+    where: { student_id: student_info.student_id }, // student_id로 찾은것중에
+    include: [
+      {
+        model: model.course_assignment,
+        attributes: [
+          "day1",
+          "day1_start_time",
+          "day1_end_time",
+          "day2",
+          "day2_start_time",
+          "day2_end_time",
+          "course_classroom",
+        ],
+        include: [
+          {
+            model: model.course,
+            attributes: ["course_name"],
+          },
+          {
+            model: model.professor,
+            attributes: ["name"],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (registration_info.length === 0) {
+    console.log("시간표 정보가 존재하지 않습니다.");
+    return res.status(401).json({ message: "시간표가 존재하지 않습니다." });
+  }
+
+  const schedule_info = registration_info.map(
+    ({ course_assignment }) => course_assignment
+  );
+
+  return res.status(200).json(schedule_info);
 }
 
 // POST 수강신청 (JOIN 필요)
@@ -148,8 +204,8 @@ async function courseDropping(req, res) {
 }
 
 module.exports = {
-  getAllRegistrationInfo,
   getAllRegistrationInfoById,
+  getAllScheduleById,
   courseRegistration,
   courseDropping,
 };

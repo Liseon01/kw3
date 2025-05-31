@@ -16,6 +16,12 @@ router.get(
   isStudent,
   registrationController.getAllRegistrationInfoById
 );
+router.get(
+  "/schedule",
+  isAuth,
+  isStudent,
+  registrationController.getAllScheduleById
+);
 router.post("/", isAuth, isStudent, registrationController.courseRegistration);
 router.delete("/:id", isAuth, isStudent, registrationController.courseDropping);
 

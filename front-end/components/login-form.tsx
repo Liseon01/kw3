@@ -15,82 +15,41 @@ export default function LoginForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  console.log("로그인 시도 중..."); 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  if (!username || !password) {
-    setError("아이디와 비밀번호를 입력해주세요.");
-    return;
-
-  }
-
-  try {
-    console.log("fetch 요청 보냄..."); 
-
-    const res = await fetch("http://localhost:7070/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id_num: username,
-        password: password,
-      }),
-    });
-
-    console.log("응답 받음");
-
-    if (!res.ok) {
-      const err = await res.json();
-      setError(err.message || "로그인에 실패했습니다.");
-      return;
+    if (!username || !password) {
+      setError("아이디와 비밀번호를 입력해주세요.")
+      return
     }
 
-    const data = await res.json();
-    console.log("로그인 성공:", data);
+    try {
+      const res = await fetch("http://localhost:7070/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_num: username,
+          password: password,
+        }),
+      })
 
-    localStorage.setItem("token", data.token);
-    router.push("/dashboard");
-  } catch (err) {
-    console.error("Login error:", err);
-    setError("서버 오류가 발생했습니다.");
-  }
-};
+      if (!res.ok) {
+        const err = await res.json()
+        setError(err.message || "로그인에 실패했습니다.")
+        return
+      }
 
-
-  try {
-    console.log("fetch 요청 보냄..."); 
-
-    const res = await fetch("http://localhost:7070/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id_num: username,
-        password: password,
-      }),
-    });
-
-    console.log("응답 받음");
-
-    if (!res.ok) {
-      const err = await res.json();
-      setError(err.message || "로그인에 실패했습니다.");
-      return;
+      const data = await res.json()
+      localStorage.setItem("token", data.token) // JWT 저장
+      router.push("/dashboard")
+    } catch (err) {
+      console.error("Login error:", err)
+      setError("서버 오류가 발생했습니다.")
     }
-
-    const data = await res.json();
-    console.log("로그인 성공:", data);
-
-    localStorage.setItem("token", data.token);
-    router.push("/dashboard");
-  } catch (err) {
-    console.error("Login error:", err);
-    setError("서버 오류가 발생했습니다.");
   }
-};
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">

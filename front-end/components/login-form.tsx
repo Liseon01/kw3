@@ -22,8 +22,7 @@ export default function LoginForm() {
   if (!username || !password) {
     setError("아이디와 비밀번호를 입력해주세요.");
     return;
-<<<<<<< HEAD
-=======
+
   }
 
   try {
@@ -56,7 +55,6 @@ export default function LoginForm() {
   } catch (err) {
     console.error("Login error:", err);
     setError("서버 오류가 발생했습니다.");
->>>>>>> 2deb37c4f1b5125b4fe874b6afd9a5fc4ab7df58
   }
 };
 

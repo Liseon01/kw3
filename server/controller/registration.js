@@ -1,6 +1,5 @@
 const model = require("../models");
 const { Op } = require("sequelize");
-const course_assignment = require("../models/course_assignment");
 
 // GET 수강신청 내역 확인
 async function getAllRegistrationInfoById(req, res) {

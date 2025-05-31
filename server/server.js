@@ -11,6 +11,7 @@ const registrationRouter = require("./router/registration.js");
 const courseRouter = require("./router/course.js");
 const collegeRouter = require("./router/college.js");
 const courseAssignmentRouter = require("./router/course_assignment.js");
+const gradeRouter = require("./router/grade.js");
 
 const app = express();
 const sequelize = new Sequelize(
@@ -27,6 +28,7 @@ app.use("/registration", registrationRouter);
 app.use("/course", courseRouter);
 app.use("/college", collegeRouter);
 app.use("/courseAssignment", courseAssignmentRouter);
+app.use("/grade", gradeRouter);
 
 app.use((req, res, next) => {
   res.sendStatus(404);

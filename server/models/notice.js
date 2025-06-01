@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      registration.belongsTo(models.course_assignment, {
+      notice.belongsTo(models.course_assignment, {
         foreignKey: "course_assignment_id",
         onDelete: "CASCADE",
         onUpdate: "CASCADE",

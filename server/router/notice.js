@@ -46,6 +46,10 @@ router.post(
   "/professor",
   isAuth,
   isProfessor,
+  (req, res, next) => {
+    req.folder_name = "notices";
+    next();
+  },
   upload.array("files", 5),
   noticeController.makeNotice
 );
@@ -55,6 +59,10 @@ router.put(
   "/professor/:id",
   isAuth,
   isProfessor,
+  (req, res, next) => {
+    req.folder_name = "notices";
+    next();
+  },
   upload.array("files", 5),
   noticeController.updateNotice
 );

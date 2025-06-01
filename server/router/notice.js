@@ -3,7 +3,7 @@ const { body } = require("express-validator");
 const { validate } = require("../middleware/validator.js");
 const noticeController = require("../controller/notice.js");
 const { isAuth, isStudent, isProfessor } = require("../middleware/auth.js");
-const upload_notice = require("../middleware/upload.js");
+const upload = require("../middleware/upload.js");
 
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.post(
   "/professor",
   isAuth,
   isProfessor,
-  upload_notice.array("files", 5),
+  upload.array("files", 5),
   noticeController.makeNotice
 );
 
@@ -55,7 +55,7 @@ router.put(
   "/professor/:id",
   isAuth,
   isProfessor,
-  upload_notice.array("files", 5),
+  upload.array("files", 5),
   noticeController.updateNotice
 );
 

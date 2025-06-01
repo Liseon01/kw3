@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-function deleteUploadedFilesInNotice(files) {
+function deleteUploadedFiles(files, folderName) {
   if (!files || files.length === 0) return;
 
   for (const file of files) {
@@ -9,7 +9,7 @@ function deleteUploadedFilesInNotice(files) {
       __dirname,
       "..",
       "uploads",
-      "notices",
+      folderName,
       file.filename
     );
     if (fs.existsSync(filePath)) {
@@ -18,4 +18,4 @@ function deleteUploadedFilesInNotice(files) {
   }
 }
 
-module.exports = deleteUploadedFilesInNotice;
+module.exports = deleteUploadedFiles;

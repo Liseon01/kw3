@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      registration.belongsTo(models.notice, {
+      notice_file.belongsTo(models.notice, {
         foreignKey: "notice_id",
         onDelete: "CASCADE",
         onUpdate: "CASCADE",

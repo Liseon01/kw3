@@ -28,42 +28,38 @@ const isAuth = async (req, res, next) => {
 
 const isStudent = async (req, res, next) => {
   const user_id = req.user_id;
-  const user_info = await model.user
-    .findOne({ where: { user_id: user_id } })
+  const student_info = await model.student
+    .findOne({
+      where: { user_id: user_id },
+    })
     .catch((err) => {
       console.log(err);
-      console.log("Sever Error. isStudent");
-      return res.status(500).json({ message: "Server Error" });
+      return res.status(500).json("Server Error");
     });
-  if (!user_info) {
-    console.log("유저 정보를 찾을 수 없습니다. function: isStudent");
+  if (!student_info) {
+    console.log("학생 정보를 찾을 수 없습니다. function: isStudent");
     return res.status(401).json({ message: "Invalid Access" });
   }
-  if (user_info.role === "student") next();
-  else {
-    console.log("사용자가 학생이 아닙니다. function: isStudent");
-    return res.status(401).json({ message: "Invalid Access" });
-  }
+  req.student_id = student_info.student_id;
+  next();
 };
 
 const isProfessor = async (req, res, next) => {
   const user_id = req.user_id;
-  const user_info = await model.user
-    .findOne({ where: { user_id: user_id } })
+  const professor_info = await model.professor
+    .findOne({
+      where: { user_id: user_id },
+    })
     .catch((err) => {
       console.log(err);
-      console.log("Sever Error. isStudent");
-      return res.status(500).json({ message: "Server Error" });
+      return res.status(500).json("Server Error");
     });
-  if (!user_info) {
-    console.log("유저 정보를 찾을 수 없습니다. function: isStudent");
+  if (!professor_info) {
+    console.log("교수 정보를 찾을 수 없습니다. function: isStudent");
     return res.status(401).json({ message: "Invalid Access" });
   }
-  if (user_info.role === "professor") next();
-  else {
-    console.log("사용자가 교수가 아닙니다. function: isStudent");
-    return res.status(401).json({ message: "Invalid Access" });
-  }
+  req.professor_id = professor_info.professor_id;
+  next();
 };
 
 module.exports = { isAuth, isStudent, isProfessor };

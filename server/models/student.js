@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("남", "여"),
         allowNull: false,
       },
+      phone_number: {
+        type: DataTypes.STRING(11),
+        allowNull: false,
+      },
       grade: {
         type: DataTypes.ENUM("1학년", "2학년", "3학년", "4학년"),
         allowNull: false,

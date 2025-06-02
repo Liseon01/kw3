@@ -3,6 +3,33 @@ const bcrypt = require("bcrypt");
 const model = require("../models");
 const config = require("../configs/config");
 
+async function signup(req, res) {
+  const { password, identity_num, name, gender, phone_number } = req.body;
+  const password_hashed = await bcrypt.hash(password, config.bcrypt.saltRounds);
+  const identity_num_hashed = await bcrypt.hash(
+    identity_num,
+    config.bcrypt.saltRounds
+  );
+  const data = {
+    password_hashed,
+    identity_num_hashed,
+    name,
+    gender,
+    phone_number,
+    last_login_date: new Date(),
+    role: "학생",
+    is_active_verified: 0,
+  };
+  try {
+    await model.user.create(data);
+    res.status(201).json({ message: "회원가입 신청이 완료되었습니다." });
+  } catch (err) {
+    console.log(err);
+    console.log("회원가입 신청이 실패하였습니다.");
+    res.status(500).json({ message: "회원가입 신청이 실패하였습니다." });
+  }
+}
+
 async function login(req, res) {
   const { id_num, password } = req.body;
   const user = await model.user // 리턴값 Object
@@ -36,4 +63,4 @@ async function me(req, res, next) {
   res.status(200).json({ token: req.token, id_num: user.id_num });
 }
 
-module.exports = { login, me };
+module.exports = { signup, login, me };

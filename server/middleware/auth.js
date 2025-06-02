@@ -62,4 +62,19 @@ const isProfessor = async (req, res, next) => {
   next();
 };
 
-module.exports = { isAuth, isStudent, isProfessor };
+const isMaster = async (req, res, next) => {
+  const user_id = req.user_id;
+  const is_master = await model.user
+    .findOne({ where: { user_id: user_id } })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json("Server Error");
+    });
+  if (!is_master) {
+    console.log("관리자 정보를 찾을 수 없습니다. function: isMaster");
+    return res.status(401).json({ message: "Invalid Access" });
+  }
+  next();
+};
+
+module.exports = { isAuth, isStudent, isProfessor, isMaster };

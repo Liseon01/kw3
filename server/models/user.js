@@ -1,6 +1,6 @@
 "use strict";
-const { Model, Sequelize } = require("sequelize");
-module.exports = (sequelize, Sequelize) => {
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     /**
      * Helper method for defining associations.
@@ -17,41 +17,53 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
+      },
+      name: {
+        type: DataTypes.STRING(50),
+        allowNull: false,
+      },
+      gender: {
+        type: DataTypes.ENUM("남", "여"),
+        allowNull: false,
+      },
+      phone_number: {
+        type: DataTypes.STRING(11),
+        allowNull: false,
       },
       id_num: {
-        type: Sequelize.STRING(10),
-        allowNull: false,
+        type: DataTypes.STRING(10),
+        allowNull: true,
         unique: true,
       },
       password_hashed: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
-      identity_num: {
-        type: Sequelize.STRING(13),
+      identity_num_hashed: {
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
       last_login_date: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: true, // 다시 확인 필요
       },
       role: {
-        type: Sequelize.ENUM("student", "professor", "manager"),
+        type: DataTypes.ENUM("학생", "교수", "관리자", "미정"),
         allowNull: false,
       },
       is_active_verified: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       createdAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         defaultValue: sequelize.fn("now"),
       },
       updatedAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         defaultValue: sequelize.fn("now"),
       },
     },

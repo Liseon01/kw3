@@ -10,7 +10,7 @@ module.exports = {
       {
         name: "이재용",
         gender: "남",
-        contact: "01000005555",
+        phone_number: "01000005555",
         address: "서울시어쩌구",
         hire_date: new Date(),
         status: "재직",

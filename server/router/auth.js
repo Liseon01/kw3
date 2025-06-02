@@ -18,6 +18,8 @@ const validateCredential = [
   validate,
 ];
 
+router.post("/signup", authController.signup);
+
 router.post("/login", validateCredential, authController.login);
 
 router.get("/me", isAuth, authController.me); // req.user_id가 잘 전달되는지 확인하기 위함

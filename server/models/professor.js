@@ -1,5 +1,5 @@
 "use strict";
-const { Model, STRING } = require("sequelize");
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class professor extends Model {
     /**
@@ -29,15 +29,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
       gender: {
         type: DataTypes.ENUM("남", "여"),
         allowNull: false,
       },
-      contact: {
-        type: DataTypes.STRING(20),
+      phone_number: {
+        type: DataTypes.STRING(11),
         allowNull: false,
       },
       address: {

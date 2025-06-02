@@ -17,6 +17,7 @@ const documentRouter = require("./router/document.js");
 const syllabusRouter = require("./router/syllabus.js");
 const assignmentRouter = require("./router/assignment.js");
 const submissionRouter = require("./router/submission.js");
+const masterRouter = require("./router/master.js");
 
 const app = express();
 const sequelize = new Sequelize(
@@ -39,6 +40,7 @@ app.use("/document", documentRouter);
 app.use("/syllabus", syllabusRouter);
 app.use("/assignment", assignmentRouter);
 app.use("/submission", submissionRouter);
+app.use("/master", masterRouter);
 
 app.use("/uploads", express.static("uploads"));
 

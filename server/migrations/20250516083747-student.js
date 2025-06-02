@@ -18,12 +18,12 @@ module.exports = {
         type: Sequelize.ENUM("남", "여"),
         allowNull: false,
       },
-      grade: {
-        type: Sequelize.ENUM("1학년", "2학년", "3학년", "4학년"),
-        allowNull: false,
-      },
       phone_number: {
         type: Sequelize.STRING(11),
+        allowNull: false,
+      },
+      grade: {
+        type: Sequelize.ENUM("1학년", "2학년", "3학년", "4학년"),
         allowNull: false,
       },
       address: {

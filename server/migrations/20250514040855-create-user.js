@@ -9,9 +9,21 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      name: {
+        type: Sequelize.STRING(50),
+        allowNull: false,
+      },
+      gender: {
+        type: Sequelize.ENUM("남", "여"),
+        allowNull: false,
+      },
+      phone_number: {
+        type: Sequelize.STRING(11),
+        allowNull: false,
+      },
       id_num: {
         type: Sequelize.STRING(10),
-        allowNull: false,
+        allowNull: true,
         unique: true,
       },
       password_hashed: {
@@ -19,8 +31,8 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      identity_num: {
-        type: Sequelize.STRING(13),
+      identity_num_hashed: {
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
@@ -29,7 +41,7 @@ module.exports = {
         allowNull: true, // 다시 확인 필요
       },
       role: {
-        type: Sequelize.ENUM("student", "professor", "manager"),
+        type: Sequelize.ENUM("학생", "교수", "관리자", "미정"),
         allowNull: false,
       },
       is_active_verified: {

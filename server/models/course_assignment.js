@@ -8,12 +8,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      course_assignment.belongsTo(models.syllabus, {
-        foreignKey: "syllabus_id",
-        onDelete: "SET NULL",
-        onUpdate: "CASCADE",
-      });
-
       course_assignment.belongsTo(models.semester, {
         foreignKey: "semester_id",
         onDelete: "CASCADE",
@@ -107,10 +101,6 @@ module.exports = (sequelize, DataTypes) => {
       course_classroom: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      syllabus_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
       },
       semester_id: {
         type: DataTypes.INTEGER,

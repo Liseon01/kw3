@@ -56,6 +56,10 @@ module.exports = {
         allowNull: true,
         defaultValue: null,
       },
+      course_assignment_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
 
       createdAt: {
         allowNull: false,

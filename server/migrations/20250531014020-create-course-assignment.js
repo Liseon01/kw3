@@ -62,10 +62,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      syllabus_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       semester_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

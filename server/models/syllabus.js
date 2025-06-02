@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       });
+      syllabus.belongsTo(models.semester, {
+        foreignKey: "semester_id",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
     }
   }
   syllabus.init(
@@ -99,6 +104,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: null,
       },
       course_assignment_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      semester_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

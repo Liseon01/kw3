@@ -60,6 +60,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      semester_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
 
       createdAt: {
         allowNull: false,

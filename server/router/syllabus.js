@@ -8,9 +8,6 @@ const router = express.Router();
 
 const validateCredential = [];
 
-// GET 강의계획서 검색
-router.get("/", isAuth, syllabusController.getAllSyllabusInfoList);
-
 // GET 강의계획서 조회
 router.get("/:id", isAuth, syllabusController.getSyllabusInfo);
 

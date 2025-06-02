@@ -2,62 +2,96 @@ const model = require("../models");
 const { Op } = require("sequelize");
 const course_assignment = require("../models/course_assignment");
 
-// GET 대학, 학부, 과목명, 교수명 쿼리
+// GET 대학, 학부, 과목명, 교수명 쿼리, 학기 id
 async function getCourseAssignmentInfo(req, res, next) {
-  const { college_id, department_id, course_name, professor_name } = req.query;
+  const {
+    college_id,
+    department_id,
+    course_name,
+    professor_name,
+    semester_id,
+  } = req.query;
 
-  const where_condition = {};
+  try {
+    // 1) course_assignment 테이블 레벨 WHERE 조건
+    const where_course_assignment = {};
+    if (semester_id) {
+      where_course_assignment.semester_id = semester_id;
+    }
 
-  if (college_id) {
-    where_condition.college_id = college_id;
-  }
-  if (department_id) {
-    where_condition.department_id = department_id;
-  }
-  // include 안에 들어갈 조건
-  const courseInclude = {
-    model: model.course,
-    attributes: ["course_name"],
-  };
+    if (department_id) {
+      // department_id & college_id
+      where_course_assignment.department_id = department_id;
+      const department_info = await model.department.findOne({
+        where: { department_id: department_id, college_id: college_id },
+      });
+      if (!department_info) {
+        console.log("대학 학부정보가 올바르지 않습니다.");
+        return res
+          .status(404)
+          .json({ message: "대학 학부정보가 올바르지 않습니다." });
+      }
+    } else if (college_id) {
+      // only college_id
+      const departments = await model.department.findAll({
+        attributes: ["department_id"],
+        where: { college_id },
+        raw: true,
+      });
+      const department_id_list = departments.map((d) => d.department_id);
+      console.log(department_id_list); // TEST
 
-  if (course_name) {
-    courseInclude.where = {
-      course_name: {
-        [Op.like]: `%${course_name}%`,
-      },
+      if (!department_id_list.length) {
+        return res
+          .status(404)
+          .json({ message: "해당 대학에 속한 학부가 존재하지 않습니다." });
+      }
+      where_course_assignment.department_id = { [Op.in]: department_id_list };
+    }
+
+    const includeArr = [];
+
+    const course_include = {
+      model: model.course,
+      attributes: ["course_name"],
+      ...(course_name
+        ? {
+            where: {
+              course_name: { [Op.like]: `%${course_name}%` },
+            },
+          }
+        : {}),
     };
-  }
-  const professorInclude = {
-    model: model.professor,
-    attributes: ["name"],
-  };
+    includeArr.push(course_include);
 
-  if (professor_name) {
-    professorInclude.where = {
-      name: {
-        [Op.like]: `%${professor_name}%`,
-      },
+    const professor_include = {
+      model: model.professor,
+      attributes: ["name"],
+      ...(professor_name
+        ? {
+            where: {
+              name: { [Op.like]: `%${professor_name}%` },
+            },
+          }
+        : {}),
     };
-  }
+    includeArr.push(professor_include);
 
-  const course_info = await model.course_assignment
-    .findAll({
-      where: where_condition,
-      include: [courseInclude, professorInclude],
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log("검색중 오류가 발생했습니다.");
-      return res.status(500).json({ meesage: "Server Error" });
+    const results = await model.course_assignment.findAll({
+      where: where_course_assignment,
+      include: includeArr,
     });
 
-  if (course_info.length == 0) {
-    console.log("등록된 과목 내역이 존재하지 않습니다.");
-    return res
-      .status(401)
-      .json({ message: "등록된 과목 내역이 존재하지 않습니다." });
+    if (!results.length) {
+      return res
+        .status(404)
+        .json({ message: "강의등록정보가 존재하지 않습니다." });
+    }
+    return res.status(200).json(results);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server Error" });
   }
-  return res.status(200).json(course_info);
 }
 
 //---------------------------------------------------------------------------------------------

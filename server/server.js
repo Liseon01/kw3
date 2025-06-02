@@ -15,6 +15,8 @@ const gradeRouter = require("./router/grade.js");
 const noticeRouter = require("./router/notice.js");
 const documentRouter = require("./router/document.js");
 const syllabusRouter = require("./router/syllabus.js");
+const assignmentRouter = require("./router/assignment.js");
+const submissionRouter = require("./router/submission.js");
 
 const app = express();
 const sequelize = new Sequelize(
@@ -35,6 +37,8 @@ app.use("/grade", gradeRouter);
 app.use("/notice", noticeRouter);
 app.use("/document", documentRouter);
 app.use("/syllabus", syllabusRouter);
+app.use("/assignment", assignmentRouter);
+app.use("/submission", submissionRouter);
 
 app.use("/uploads", express.static("uploads"));
 

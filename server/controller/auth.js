@@ -46,7 +46,7 @@ async function login(req, res) {
     return res.status(401).json({ message: "Invalid password" }); // TEST 문구 바꾸기
   }
   const token = createJwtToken(user.user_id);
-  res.status(200).json({ token, id_num });
+  res.status(200).json({ token, user });
 }
 
 function createJwtToken(id) {

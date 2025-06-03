@@ -16,7 +16,7 @@ async function getAllSignUpRequestList(req, res) {
         .status(404)
         .json({ message: "회원가입 요청목록이 존재하지 않습니다." });
     }
-    return res.status(404).json(singup_list);
+    return res.status(200).json(singup_list);
   } catch (err) {
     console.log(err);
     console.log("Server Error");

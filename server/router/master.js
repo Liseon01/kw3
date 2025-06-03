@@ -8,7 +8,18 @@ const router = express.Router();
 
 router.get("/", isAuth, isMaster, masterController.getAllSignUpRequestList);
 
-router.put("/:id", isAuth, isMaster, masterController.permitSignUpRequest);
+router.post(
+  "/student/:id",
+  isAuth,
+  isMaster,
+  masterController.permitStudentSignUpRequest
+);
+router.post(
+  "/professor/:id",
+  isAuth,
+  isMaster,
+  masterController.permitProfessorSignUpRequest
+);
 
 router.delete("/:id", isAuth, isMaster, masterController.deleteSignUpRequest);
 

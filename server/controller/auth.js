@@ -4,7 +4,8 @@ const model = require("../models");
 const config = require("../configs/config");
 
 async function signup(req, res) {
-  const { password, identity_num, name, gender, phone_number } = req.body;
+  const { password, identity_num, name, gender, phone_number, email, role } =
+    req.body;
   const password_hashed = await bcrypt.hash(password, config.bcrypt.saltRounds);
   const identity_num_hashed = await bcrypt.hash(
     identity_num,
@@ -16,8 +17,9 @@ async function signup(req, res) {
     name,
     gender,
     phone_number,
+    email,
     last_login_date: new Date(),
-    role: "학생",
+    role,
     is_active_verified: 0,
   };
   try {

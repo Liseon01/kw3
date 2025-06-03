@@ -9,18 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING(50),
-        allowNull: false,
-      },
-      gender: {
-        type: Sequelize.ENUM("남", "여"),
-        allowNull: false,
-      },
-      phone_number: {
-        type: Sequelize.STRING(11),
-        allowNull: false,
-      },
       address: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -39,7 +27,8 @@ module.exports = {
       },
       emergency_contact: {
         type: Sequelize.STRING(20),
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
       },
       zip_code: {
         type: Sequelize.STRING(5),

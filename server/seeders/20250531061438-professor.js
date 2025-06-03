@@ -8,9 +8,6 @@ module.exports = {
     );
     await queryInterface.bulkInsert("professors", [
       {
-        name: "이재용",
-        gender: "남",
-        phone_number: "01000005555",
         address: "서울시어쩌구",
         hire_date: new Date(),
         status: "재직",

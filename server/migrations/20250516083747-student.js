@@ -10,18 +10,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING(50),
-        allowNull: false,
-      },
-      gender: {
-        type: Sequelize.ENUM("남", "여"),
-        allowNull: false,
-      },
-      phone_number: {
-        type: Sequelize.STRING(11),
-        allowNull: false,
-      },
       grade: {
         type: Sequelize.ENUM("1학년", "2학년", "3학년", "4학년"),
         allowNull: false,
@@ -35,10 +23,6 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.fn("now"),
       },
-      email: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
-      },
       status: {
         type: Sequelize.ENUM("재학", "휴학", "졸업"),
         allowNull: false,
@@ -49,7 +33,8 @@ module.exports = {
       },
       parent_phone_number: {
         type: Sequelize.STRING(11),
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
       },
       zip_code: {
         type: Sequelize.STRING(10),
@@ -64,11 +49,6 @@ module.exports = {
         type: Sequelize.ENUM("입금완료", "미확인"),
         allowNull: true, // 관계자가 직접 등록
         defaultValue: "미확인",
-      },
-      current_semester: {
-        type: Sequelize.ENUM("1학기", "2학기", "여름학기", "겨울학기"),
-        allowNull: true, // 관계자가 직접 등록
-        defaultValue: "1학기",
       },
       createdAt: {
         type: Sequelize.DATE,

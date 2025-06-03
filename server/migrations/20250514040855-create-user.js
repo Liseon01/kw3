@@ -36,6 +36,10 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       last_login_date: {
         type: Sequelize.DATE,
         allowNull: true, // 다시 확인 필요

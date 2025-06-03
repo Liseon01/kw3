@@ -24,14 +24,74 @@ async function getAllSignUpRequestList(req, res) {
   }
 }
 
-// PUT
-async function permitSignUpRequest(req, res) {
+// POST
+async function permitStudentSignUpRequest(req, res) {
   const user_id = req.params.id;
   const is_verified = false;
-  const { id_num, role } = req.body;
-  const data = {
+  const {
     id_num,
-    role,
+    grade,
+    address,
+    status,
+    zip_code,
+    admission_type,
+    tuition_status,
+    department_id,
+  } = req.body; // 여기서부터
+
+  const user_data = {
+    id_num,
+    is_active_verified: true,
+  };
+
+  try {
+    const signup_info = await model.user.findOne({
+      where: { user_id: user_id, is_active_verified: is_verified },
+    });
+    if (!signup_info) {
+      console.log("해당 회원가입 요청이 존재하지 않습니다.");
+      return res
+        .status(404)
+        .json({ message: "해당 회원가입 요청이 존재하지 않습니다." });
+    }
+    if (signup_info.role !== "학생") {
+      return res.status(404).json({ message: "학생의 회원요청이 아닙니다." });
+    }
+    await signup_info.update(user_data);
+
+    const student_data = {
+      grade,
+      address,
+      enrollment_date: new Date(),
+      status,
+      zip_code,
+      admission_type,
+      tuition_status,
+      department_id,
+      user_id: signup_info.user_id,
+    };
+
+    await model.student.create(student_data);
+
+    return res
+      .status(201)
+      .json({ message: "회원가입 요청을 정상적으로 승인하였습니다." });
+  } catch (err) {
+    console.log(err);
+    console.log("Server Error");
+    return res.status(500).json({ message: "Server Error" });
+  }
+}
+
+// POST
+async function permitProfessorSignUpRequest(req, res) {
+  const user_id = req.params.id;
+  const is_verified = false;
+  const { id_num, address, status, zip_code, title, field, department_id } =
+    req.body;
+
+  const user_data = {
+    id_num,
     is_active_verified: true,
   };
   try {
@@ -44,8 +104,24 @@ async function permitSignUpRequest(req, res) {
         .status(404)
         .json({ message: "해당 회원가입 요청이 존재하지 않습니다." });
     }
+    if (signup_info.role !== "교수") {
+      return res.status(404).json({ message: "교수의 회원요청이 아닙니다." });
+    }
 
-    await signup_info.update(data);
+    await signup_info.update(user_data);
+
+    const professor_data = {
+      address,
+      hire_date: new Date(),
+      status,
+      zip_code,
+      title,
+      field,
+      department_id,
+      user_id: signup_info.user_id,
+    };
+
+    await model.professor.create(professor_data);
     return res
       .status(201)
       .json({ message: "회원가입 요청을 정상적으로 승인하였습니다." });
@@ -81,6 +157,7 @@ async function deleteSignUpRequest(req, res) {
 
 module.exports = {
   getAllSignUpRequestList,
-  permitSignUpRequest,
+  permitStudentSignUpRequest,
+  permitProfessorSignUpRequest,
   deleteSignUpRequest,
 };

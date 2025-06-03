@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       last_login_date: {
         type: DataTypes.DATE,
         allowNull: true, // 다시 확인 필요

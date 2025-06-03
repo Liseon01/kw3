@@ -28,18 +28,6 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      name: {
-        type: DataTypes.STRING(50),
-        allowNull: false,
-      },
-      gender: {
-        type: DataTypes.ENUM("남", "여"),
-        allowNull: false,
-      },
-      phone_number: {
-        type: DataTypes.STRING(11),
-        allowNull: false,
-      },
       address: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -58,7 +46,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       emergency_contact: {
         type: DataTypes.STRING(20),
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
       },
       zip_code: {
         type: DataTypes.STRING(5),

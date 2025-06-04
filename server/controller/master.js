@@ -26,7 +26,6 @@ async function getAllSignUpRequestList(req, res) {
 
 // POST
 async function permitStudentSignUpRequest(req, res) {
-  const user_id = req.params.id;
   const is_verified = false;
   const {
     id_num,
@@ -37,6 +36,7 @@ async function permitStudentSignUpRequest(req, res) {
     admission_type,
     tuition_status,
     department_id,
+    user_id,
   } = req.body; // 여기서부터
 
   const user_data = {
@@ -85,10 +85,17 @@ async function permitStudentSignUpRequest(req, res) {
 
 // POST
 async function permitProfessorSignUpRequest(req, res) {
-  const user_id = req.params.id;
   const is_verified = false;
-  const { id_num, address, status, zip_code, title, field, department_id } =
-    req.body;
+  const {
+    id_num,
+    address,
+    status,
+    zip_code,
+    title,
+    field,
+    department_id,
+    user_id,
+  } = req.body;
 
   const user_data = {
     id_num,

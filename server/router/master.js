@@ -9,13 +9,13 @@ const router = express.Router();
 router.get("/", isAuth, isMaster, masterController.getAllSignUpRequestList);
 
 router.post(
-  "/student/:id",
+  "/student",
   isAuth,
   isMaster,
   masterController.permitStudentSignUpRequest
 );
 router.post(
-  "/professor/:id",
+  "/professor",
   isAuth,
   isMaster,
   masterController.permitProfessorSignUpRequest

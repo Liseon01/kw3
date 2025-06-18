@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -10,19 +10,30 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Header from "@/components/header"
+import { useToast } from "@/hooks/use-toast"
 
 export default function RegistrationPage() {
+  const { toast } = useToast()
   const [searchParams, setSearchParams] = useState({
     year: "2025",
     semester: "1학기",
-    college: "공과대학",
-    major: "컴퓨터공학",
     courseName: "",
     professorName: "",
+    department: "all",
   })
 
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [isSearched, setIsSearched] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  // 사용자 정보 로드
+  useEffect(() => {
+    const userStr = sessionStorage.getItem("user")
+    if (userStr) {
+      setUser(JSON.parse(userStr))
+    }
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -33,49 +44,137 @@ export default function RegistrationPage() {
     setSearchParams((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
 
-    // 실제 구현에서는 API 호출을 통해 강의 정보를 가져온다.
-    const mockResults = [
-      {
-        id: "CS101",
-        name: "컴퓨터 프로그래밍",
-        professor: "김교수",
-        credit: 3,
-        time: "월 10:30-12:00, 수 10:30-12:00",
-        room: "새빛관 401",
-        capacity: 40,
-        registered: 32,
-      },
-      {
-        id: "CS201",
-        name: "자료구조",
-        professor: "이교수",
-        credit: 3,
-        time: "화 13:00-14:30, 목 13:00-14:30",
-        room: "비마관 202",
-        capacity: 35,
-        registered: 30,
-      },
-      {
-        id: "CS301",
-        name: "알고리즘",
-        professor: "박교수",
-        credit: 3,
-        time: "월 15:00-16:30, 수 15:00-16:30",
-        room: "새빛관 505",
-        capacity: 30,
-        registered: 28,
-      },
-    ]
+    try {
+      setIsSearched(false)
 
-    setSearchResults(mockResults)
-    setIsSearched(true)
+      // API 호출을 통해 실제 강의 정보 가져오기
+      const queryParams = new URLSearchParams()
+
+      if (searchParams.year) queryParams.append("year", searchParams.year)
+      if (searchParams.semester) queryParams.append("semester", searchParams.semester)
+      if (searchParams.courseName) queryParams.append("courseName", searchParams.courseName)
+      if (searchParams.professorName) queryParams.append("professorName", searchParams.professorName)
+      if (searchParams.department && searchParams.department !== "all") {
+        queryParams.append("department", searchParams.department)
+      }
+
+      const response = await fetch(`/api/courses?${queryParams.toString()}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // 강의 데이터를 수강신청 형식으로 변환
+        const formattedResults = data.courses.map((course: any) => ({
+          id: course.course_code,
+          name: course.course_name,
+          professor: course.professors?.name || "미정",
+          credit: course.credits,
+          time: formatCourseTime(course),
+          room: course.course_classroom || "미정",
+          capacity: course.max_enrollments,
+          registered: course.current_enrollments,
+          course_id: course.course_id,
+          status: course.course_status,
+        }))
+
+        setSearchResults(formattedResults)
+        setIsSearched(true)
+      } else {
+        console.error("강의 조회 실패:", data.error)
+        setSearchResults([])
+        setIsSearched(true)
+        toast({
+          title: "오류",
+          description: data.error || "강의 조회에 실패했습니다.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("강의 조회 중 오류:", error)
+      setSearchResults([])
+      setIsSearched(true)
+      toast({
+        title: "오류",
+        description: "강의 조회 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleRegister = (courseId: string) => {
-    alert(`${courseId} 과목이 수강신청 되었습니다.`)
+  const handleRegister = async (courseId: string) => {
+    try {
+      // 현재 로그인한 사용자 정보 가져오기
+      const userStr = sessionStorage.getItem("user")
+      if (!userStr) {
+        toast({
+          title: "오류",
+          description: "로그인이 필요합니다.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const user = JSON.parse(userStr)
+
+      // 학생 정보 추가
+      const response = await fetch("/api/enrollments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: user.student_id,
+          course_id: courseId,
+          student_name: user.name,
+          student_email: user.email,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast({
+          title: "성공",
+          description: "수강신청이 완료되었습니다.",
+        })
+        // 검색 결과 새로고침
+        handleSearch(new Event("submit") as any)
+      } else {
+        toast({
+          title: "오류",
+          description: data.error || "수강신청에 실패했습니다.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("수강신청 오류:", error)
+      toast({
+        title: "오류",
+        description: "수강신청 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // 강의 시간 포맷팅 함수 추가
+  const formatCourseTime = (course: any) => {
+    let timeStr = ""
+
+    if (course.day1 && course.day1_start_time && course.day1_end_time) {
+      timeStr += `${course.day1} ${course.day1_start_time.slice(0, 5)}-${course.day1_end_time.slice(0, 5)}`
+    }
+
+    if (course.day2 && course.day2_start_time && course.day2_end_time) {
+      if (timeStr) timeStr += ", "
+      timeStr += `${course.day2} ${course.day2_start_time.slice(0, 5)}-${course.day2_end_time.slice(0, 5)}`
+    }
+
+    return timeStr || "시간 미정"
   }
 
   return (
@@ -85,21 +184,10 @@ export default function RegistrationPage() {
       <main className="flex-1 container px-4 py-6">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="year" className="block mb-2 text-sm">
-                년도
-              </Label>
-              <Select defaultValue={searchParams.year} onValueChange={(value) => handleSelectChange("year", value)}>
-                <SelectTrigger id="year" className="w-full">
-                  <SelectValue placeholder="년도 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="md:col-span-2 mb-4">
+              <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                📅 <strong>2025학년도</strong> 수강신청입니다.
+              </p>
             </div>
 
             <div>
@@ -118,43 +206,6 @@ export default function RegistrationPage() {
                   <SelectItem value="2학기">2학기</SelectItem>
                   <SelectItem value="여름학기">여름학기</SelectItem>
                   <SelectItem value="겨울학기">겨울학기</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="college" className="block mb-2 text-sm">
-                대학
-              </Label>
-              <Select
-                defaultValue={searchParams.college}
-                onValueChange={(value) => handleSelectChange("college", value)}
-              >
-                <SelectTrigger id="college" className="w-full">
-                  <SelectValue placeholder="대학 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="공과대학">공과대학</SelectItem>
-                  <SelectItem value="인문대학">인문대학</SelectItem>
-                  <SelectItem value="경영대학">경영대학</SelectItem>
-                  <SelectItem value="자연과학대학">자연과학대학</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="major" className="block mb-2 text-sm">
-                전공
-              </Label>
-              <Select defaultValue={searchParams.major} onValueChange={(value) => handleSelectChange("major", value)}>
-                <SelectTrigger id="major" className="w-full">
-                  <SelectValue placeholder="전공 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="컴퓨터공학">컴퓨터공학</SelectItem>
-                  <SelectItem value="전자공학">전자공학</SelectItem>
-                  <SelectItem value="소프트웨어학">소프트웨어학</SelectItem>
-                  <SelectItem value="정보융합학">정보융합학</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -185,9 +236,30 @@ export default function RegistrationPage() {
               />
             </div>
 
+            <div>
+              <Label htmlFor="department" className="block mb-2 text-sm">
+                학과
+              </Label>
+              <Select
+                defaultValue={searchParams.department}
+                onValueChange={(value) => handleSelectChange("department", value)}
+              >
+                <SelectTrigger id="department" className="w-full">
+                  <SelectValue placeholder="학과 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">- 전체 -</SelectItem>
+                  <SelectItem value="1">컴퓨터공학과</SelectItem>
+                  <SelectItem value="2">전자공학과</SelectItem>
+                  <SelectItem value="3">소프트웨어학과</SelectItem>
+                  <SelectItem value="4">로봇학과</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="md:col-span-2 flex justify-center mt-2">
-              <Button type="submit" className="bg-rose-600 hover:bg-rose-700 px-8">
-                조회
+              <Button type="submit" className="bg-rose-600 hover:bg-rose-700 px-8" disabled={isLoading}>
+                {isLoading ? "조회 중..." : "조회"}
               </Button>
             </div>
           </form>
@@ -234,30 +306,39 @@ export default function RegistrationPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {searchResults.map((course) => (
-                    <TableRow key={course.id}>
-                      <TableCell className="font-medium">{course.id}</TableCell>
-                      <TableCell>{course.name}</TableCell>
-                      <TableCell>{course.professor}</TableCell>
-                      <TableCell>{course.credit}</TableCell>
-                      <TableCell>
-                        <div>{course.time}</div>
-                        <div className="text-gray-500 text-sm">{course.room}</div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {course.registered}/{course.capacity}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Button
-                          size="sm"
-                          className="bg-rose-600 hover:bg-rose-700"
-                          onClick={() => handleRegister(course.id)}
-                        >
-                          신청
-                        </Button>
+                  {searchResults.length > 0 ? (
+                    searchResults.map((course) => (
+                      <TableRow key={course.id}>
+                        <TableCell className="font-medium">{course.id}</TableCell>
+                        <TableCell>{course.name}</TableCell>
+                        <TableCell>{course.professor}</TableCell>
+                        <TableCell>{course.credit}</TableCell>
+                        <TableCell>
+                          <div>{course.time}</div>
+                          <div className="text-gray-500 text-sm">{course.room}</div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {course.registered}/{course.capacity}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            size="sm"
+                            className="bg-rose-600 hover:bg-rose-700"
+                            onClick={() => handleRegister(course.course_id)}
+                            disabled={!user}
+                          >
+                            신청
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4 text-gray-500">
+                        조회된 강좌가 없습니다. 조건을 변경하여 다시 조회해 주세요.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </div>
